@@ -12,12 +12,6 @@ const INFO = "/api/ai-gf/session/info";
 const CHAT = "/api/ai-gf/chat";
 
 const PERSIST_PATH = process.env.AI_GF_SESSION_PATH || "/home/shash/clawd/state/ai-gf-sessions.json";
-const MODEL = process.env.AI_GF_MODEL || "Doubao-pro-32k";
-const GATEWAY = process.env.AI_GF_GATEWAY_URL || "http://127.0.0.1:18789";
-const TOKEN = process.env.AI_GF_GATEWAY_TOKEN || process.env.VOICE_GATEWAY_TOKEN || "";
-const MODEL_BASE = process.env.AI_GF_MODEL_BASE_URL || process.env.CUSTOM_API_URL || `${GATEWAY}/v1`;
-const MODEL_API_KEY = process.env.AI_GF_MODEL_API_KEY || process.env.CUSTOM_API_KEY || TOKEN;
-const TIMEOUT_MS = Number(process.env.AI_GF_TIMEOUT_MS || "25000");
 const AGENT_TIMEOUT_MS = Number(process.env.AI_GF_AGENT_TIMEOUT_MS || "30000");
 const ROUTE_MODE = (process.env.AI_GF_ROUTE_MODE || "gateway").toLowerCase();
 const SESSION_MODE = (process.env.AI_GF_SESSION_MODE || "fixed").toLowerCase(); // fixed | token
@@ -229,44 +223,15 @@ async function callViaOpenClawSession(sessionToken: string, userText: string, se
   throw new Error("agent payload text empty");
 }
 
-async function callModelDirect(messages: Array<{ role: string; content: string }>, fallbackText: string): Promise<string> {
-  const base = MODEL_BASE.replace(/\/$/, "");
-  const headers: Record<string, string> = {
-    "content-type": "application/json",
-    ...(MODEL_API_KEY ? { authorization: `Bearer ${MODEL_API_KEY}` } : {}),
-  };
-  const candidates = Array.from(new Set([MODEL, "Doubao-pro-32k", "Doubao-pro-128k", "Doubao-lite-32k"]));
-
-  for (const modelName of candidates) {
-    const resp = await fetch(`${base}/chat/completions`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ model: modelName, temperature: 0.7, max_tokens: 512, messages }),
-    });
-    if (!resp.ok) continue;
-    const data = await resp.json().catch(() => ({}));
-    const t = extractAssistantText(data);
-    if (t) return t;
-  }
-  return fallbackText;
-}
-
 async function callModel(session: GfSession, text: string): Promise<GfReply> {
   session.history.push({ role: "user", content: text });
   const system = session.history.find((m) => m.role === "system")?.content || SYSTEM_PROMPT;
 
   let modelText = "";
-  try {
-    if (ROUTE_MODE === "gateway") {
-      modelText = await callViaOpenClawSession(session.token, text, GATEWAY_SESSION_PREFIX);
-    } else {
-      modelText = await callViaOpenClawSession(session.token, text, LEGACY_SESSION_PREFIX);
-    }
-  } catch {
-    modelText = await callModelDirect([
-      { role: "system", content: system },
-      ...session.history.filter((m) => m.role !== "system").slice(-12),
-    ], `收到：${text}`);
+  if (ROUTE_MODE === "gateway") {
+    modelText = await callViaOpenClawSession(session.token, text, GATEWAY_SESSION_PREFIX);
+  } else {
+    modelText = await callViaOpenClawSession(session.token, text, LEGACY_SESSION_PREFIX);
   }
 
   const safe = toStructuredReply(modelText, `收到：${text}`);
