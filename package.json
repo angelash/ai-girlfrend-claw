@@ -1,0 +1,21 @@
+{
+  "name": "@openclaw/ai-girlfriend",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "AI女友对接 - gateway-integrated core plugin",
+  "openclaw": {
+    "extensions": ["./index.ts"],
+    "install": {
+      "localPath": "extensions/ai-girlfriend",
+      "defaultChoice": "local"
+    }
+  },
+  "moltbot": {
+    "extensions": ["./index.ts"],
+    "install": {
+      "localPath": "extensions/ai-girlfriend",
+      "defaultChoice": "local"
+    }
+  }
+}

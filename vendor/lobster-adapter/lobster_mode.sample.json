@@ -1,0 +1,16 @@
+﻿{
+  "enabled": true,
+  "preferLocal": true,
+  "localWsUrl": "ws://127.0.0.1:43113/api/v1/game/ws",
+  "fallbackWsUrl": "ws://127.0.0.1:43113/api/v1/game/ws",
+  "connectTimeoutMs": 3000,
+  "enableUserNameFlow": false,
+  "adapterBaseUrl": "http://127.0.0.1:43113",
+  "pseudoSession": {
+    "userId": "lobster_local_user",
+    "token": "ai-gf-main-token",
+    "loverId": "lobster_local_lover",
+    "loginDays": 1,
+    "username": "lobster_local_user"
+  }
+}

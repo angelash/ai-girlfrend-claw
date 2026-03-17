@@ -1,0 +1,67 @@
+{
+  "host": "0.0.0.0",
+  "port": 43113,
+  "verbose": true,
+  "enableUserNameFlow": false,
+  "syntheticChatFallbackMs": 1200,
+  "session": {
+    "persistPath": "../data/sessions.json",
+    "historyMaxTurns": 30
+  },
+  "llm": {
+    "enabled": false,
+    "baseUrl": "http://127.0.0.1:3456/v1",
+    "apiKey": "",
+    "model": "custom/glm-5",
+    "temperature": 0.7,
+    "maxTokens": 512,
+    "requestTimeoutMs": 20000,
+    "systemPrompt": "你是 Lobster 模式下的数字伴侣角色。输出必须是 JSON，字段: text, emotion, actions[], subtitleTimeline[]。禁止输出 JSON 以外内容。"
+  },
+  "aiGfCore": {
+    "enabled": true,
+    "baseUrl": "http://127.0.0.1:18789",
+    "token": "",
+    "timeoutMs": 25000
+  },
+  "upstream": {
+    "enabled": false,
+    "wsUrl": "ws://127.0.0.1:43114/ws",
+    "connectTimeoutMs": 3000,
+    "headers": {}
+  },
+  "defaults": {
+    "userId": "lobster_local_user",
+    "userName": "lobster_local_user",
+    "token": "ai-gf-main-token",
+    "loverId": "lobster_local_lover",
+    "loverName": "玲梦",
+    "loginDays": 1,
+    "favorability": 0,
+    "openingSceneCompleted": true
+  },
+  "scene": {
+    "playerLocation": "game_location_living_room",
+    "aiLocation": "game_location_living_room",
+    "availableLocations": {
+      "game_location_living_room": true,
+      "game_location_balcony": true,
+      "game_location_gf_bedroom": false,
+      "game_location_bathroom": true,
+      "game_location_bedroom": true
+    },
+    "timePeriod": "game_time_period_afternoon",
+    "aiSceneId": "SC003",
+    "isAiPresent": true,
+    "sceneSliceName": "living_room_default",
+    "sceneDescription": "Player and AI are in the living room."
+  },
+  "outfit": {
+    "top": "0",
+    "bottom": "0",
+    "dress": "0",
+    "socks": "0",
+    "shoes": "0",
+    "hat": "0"
+  }
+}

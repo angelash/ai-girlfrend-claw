@@ -1,0 +1,150 @@
+{
+  "lobster-mode-token": {
+    "token": "lobster-mode-token",
+    "userId": "lobster_local_user",
+    "userName": "lobster_local_user",
+    "userNameReady": true,
+    "loverId": "lobster_local_lover",
+    "loverName": "玲梦",
+    "loginDays": 1,
+    "favorability": 0,
+    "openingSceneCompleted": true,
+    "scene": {
+      "playerLocation": "game_location_living_room",
+      "aiLocation": "game_location_living_room",
+      "availableLocations": {
+        "game_location_living_room": true,
+        "game_location_balcony": true,
+        "game_location_gf_bedroom": true,
+        "game_location_bathroom": true,
+        "game_location_bedroom": true
+      }
+    },
+    "outfit": {
+      "top": "0",
+      "bottom": "0",
+      "dress": "0",
+      "socks": "0",
+      "shoes": "0",
+      "hat": "0"
+    },
+    "history": [
+      {
+        "role": "system",
+        "content": "你是 Lobster 模式下的数字伴侣角色。输出必须是 JSON，字段: text, emotion, actions[], subtitleTimeline[]。禁止输出 JSON 以外内容。"
+      }
+    ],
+    "updatedAt": 1773731263410
+  },
+  "18a534a7-4b0b-444b-9c41-a92b2d81ae06": {
+    "token": "18a534a7-4b0b-444b-9c41-a92b2d81ae06",
+    "userId": "ash",
+    "userName": "ash",
+    "userNameReady": true,
+    "loverId": "lobster_local_lover",
+    "loverName": "玲梦",
+    "loginDays": 1,
+    "favorability": 0,
+    "openingSceneCompleted": true,
+    "scene": {
+      "playerLocation": "game_location_living_room",
+      "aiLocation": "game_location_living_room",
+      "availableLocations": {
+        "game_location_living_room": true,
+        "game_location_balcony": true,
+        "game_location_gf_bedroom": true,
+        "game_location_bathroom": true,
+        "game_location_bedroom": true
+      }
+    },
+    "outfit": {
+      "top": "0",
+      "bottom": "0",
+      "dress": "0",
+      "socks": "0",
+      "shoes": "0",
+      "hat": "0"
+    },
+    "history": [
+      {
+        "role": "system",
+        "content": "你是 Lobster 模式下的数字伴侣角色。输出必须是 JSON，字段: text, emotion, actions[], subtitleTimeline[]。禁止输出 JSON 以外内容。"
+      }
+    ],
+    "updatedAt": 1773729310242
+  },
+  "53528d02-a5eb-471a-832c-e1b34f8f70cc": {
+    "token": "53528d02-a5eb-471a-832c-e1b34f8f70cc",
+    "userId": "lobster_local_user",
+    "userName": "lobster_local_user",
+    "userNameReady": true,
+    "loverId": "lobster_local_lover",
+    "loverName": "玲梦",
+    "loginDays": 1,
+    "favorability": 0,
+    "openingSceneCompleted": true,
+    "scene": {
+      "playerLocation": "game_location_living_room",
+      "aiLocation": "game_location_living_room",
+      "availableLocations": {
+        "game_location_living_room": true,
+        "game_location_balcony": true,
+        "game_location_gf_bedroom": false,
+        "game_location_bathroom": true,
+        "game_location_bedroom": true
+      }
+    },
+    "outfit": {
+      "top": "0",
+      "bottom": "0",
+      "dress": "0",
+      "socks": "0",
+      "shoes": "0",
+      "hat": "0"
+    },
+    "history": [
+      {
+        "role": "system",
+        "content": "你是 Lobster 模式下的数字伴侣角色。输出必须是 JSON，字段: text, emotion, actions[], subtitleTimeline[]。禁止输出 JSON 以外内容。"
+      }
+    ],
+    "updatedAt": 1773739175815
+  },
+  "ai-gf-main-token": {
+    "token": "ai-gf-main-token",
+    "userId": "lobster_local_user",
+    "userName": "lobster_local_user",
+    "userNameReady": true,
+    "loverId": "lobster_local_lover",
+    "loverName": "玲梦",
+    "loginDays": 1,
+    "favorability": 0,
+    "openingSceneCompleted": true,
+    "scene": {
+      "playerLocation": "game_location_living_room",
+      "aiLocation": "game_location_living_room",
+      "availableLocations": {
+        "game_location_living_room": true,
+        "game_location_balcony": true,
+        "game_location_gf_bedroom": false,
+        "game_location_bathroom": true,
+        "game_location_bedroom": true
+      }
+    },
+    "outfit": {
+      "top": "0",
+      "bottom": "0",
+      "dress": "0",
+      "socks": "0",
+      "shoes": "0",
+      "hat": "0"
+    },
+    "history": [
+      {
+        "role": "system",
+        "content": "你是 Lobster 模式下的数字伴侣角色。输出必须是 JSON，字段: text, emotion, actions[], subtitleTimeline[]。禁止输出 JSON 以外内容。"
+      }
+    ],
+    "updatedAt": 1773761314201
+  }
+}

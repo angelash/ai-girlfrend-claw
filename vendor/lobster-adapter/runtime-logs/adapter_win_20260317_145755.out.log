@@ -1,0 +1,10 @@
+[lobster-adapter] loaded 2 sessions from disk
+[lobster-adapter] listening on 0.0.0.0:43113
+[lobster-adapter] ws: ws://0.0.0.0:43113/api/v1/game/ws
+[lobster-adapter] http: http://0.0.0.0:43113/api/v1
+[lobster-adapter] llm enabled: no
+[lobster-adapter] session persist: F:\workspace\UE\DevProject\TypeScript\lobster-adapter\data\sessions.json
+[lobster-adapter] downstream connected token=lobster-mode-token
+[lobster-adapter] downstream closed token=lobster-mode-token
+[lobster-adapter] downstream connected token=lobster-mode-token
+[lobster-adapter] downstream closed token=lobster-mode-token
