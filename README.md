@@ -50,6 +50,53 @@
 AI_GF_SESSION_PATH=C:\\openclaw\\state\\ai-gf-sessions.json
 ```
 
+## 部署说明（拉下即用 vs 本地编译）
+
+当前仓库状态：
+
+- 已提交 `vendor/lobster-adapter/dist/server.js`
+- 已提交 `vendor/lobster-adapter/node_modules`
+
+所以**默认是拉下即用**（不编译也能跑）。
+
+但更推荐生产部署使用“本地重装 + 本地编译”流程，避免不同 OS/Node 版本导致的依赖差异：
+
+```bash
+cd vendor/lobster-adapter
+npm ci
+npm run build
+```
+
+> 建议：开发机可先拉下即用；上线环境建议执行一次本地编译后再启用。
+
+## Windows 一键自检
+
+仓库已提供 PowerShell 自检脚本：
+
+- `scripts/windows-selfcheck.ps1`
+
+执行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows-selfcheck.ps1
+```
+
+可选参数：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows-selfcheck.ps1 \
+  -GatewayBaseUrl "http://127.0.0.1:18789" \
+  -AdapterBaseUrl "http://127.0.0.1:43113" \
+  -Token "ai-gf-main-token"
+```
+
+脚本会检查：
+1) openclaw 命令可用
+2) `/api/ai-gf/health`
+3) `43113/healthz`
+4) `/api/ai-gf/chat`
+5) `ws://127.0.0.1:43113/api/v1/game/ws` 握手
+
 ## 发布前自检清单
 
 按顺序执行，全部通过再给 UE 接入：
