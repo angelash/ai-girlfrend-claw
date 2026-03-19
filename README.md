@@ -5,7 +5,7 @@
 ## 当前能力
 
 - Gateway 插件路由：`/api/ai-gf/*`
-- 聊天路由：`/api/ai-gf/chat` → OpenClaw 会话（`openclaw agent --session-id ... --json`）
+- 聊天路由：`/api/ai-gf/chat` → OpenClaw runtime session API
 - 结构化输出：`text`, `emotion`, `actions`, `subtitleTimeline`
 - 内嵌 `vendor/lobster-adapter`（默认兼容 `43113` 入口）
 - 支持固定单会话与 token 分流两种会话模式
@@ -27,14 +27,12 @@
 
 ## Environment
 
-- `AI_GF_ROUTE_MODE`：`gateway`
 - `AI_GF_SESSION_MODE`：`fixed`（默认） | `token`
 - `AI_GF_FIXED_SESSION_ID`：默认 `ai-gf-fixed-session`
 - `AI_GF_GATEWAY_SESSION_PREFIX`：默认 `voice-bridge-session-ai-gf-`
 - `AI_GF_AGENT_TIMEOUT_MS`：默认 `30000`
 - `AI_GF_SESSION_PATH`：默认 `./state/ai-gf-sessions.json`（建议按部署环境配置）
 - `AI_GF_SYSTEM_PROMPT`
-- `AI_GF_OPENCLAW_BIN`：可选，覆盖 OpenClaw CLI 命令名（Windows 可设为 `openclaw.cmd` 或绝对路径）
 
 ## UE 客户端建议配置
 
@@ -45,13 +43,7 @@
 
 ## Windows 环境补充
 
-- 插件内调用 OpenClaw CLI 已兼容 Windows（默认 `openclaw.cmd` + shell 模式）
-- 若你的机器命令名不同，设置：
-
-```bash
-AI_GF_OPENCLAW_BIN=C:\\path\\to\\openclaw.cmd
-```
-
+- 该插件已改为 runtime session API 路由，不依赖本机 CLI 命令名。
 - 建议在 Windows 部署时显式设置会话持久化路径：
 
 ```bash
@@ -76,7 +68,7 @@ openclaw status
 curl -sS http://127.0.0.1:18789/api/ai-gf/health
 ```
 
-预期：返回 `ok: true`，且包含 `routeMode`、`sessionMode` 等字段。
+预期：返回 `ok: true`，且包含 `sessionMode` 等字段。
 
 ### 3) 内嵌 adapter 进程已启动（43113）
 

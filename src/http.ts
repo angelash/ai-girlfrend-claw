@@ -1,10 +1,9 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { GfReply, GfSession } from "./types.js";
+import { getRuntime } from "./runtime.js";
 
 const HEALTH = "/api/ai-gf/health";
 const LOGIN = "/api/ai-gf/session/login";
@@ -13,18 +12,13 @@ const CHAT = "/api/ai-gf/chat";
 
 const PERSIST_PATH = process.env.AI_GF_SESSION_PATH || path.resolve(process.cwd(), "state", "ai-gf-sessions.json");
 const AGENT_TIMEOUT_MS = Number(process.env.AI_GF_AGENT_TIMEOUT_MS || "30000");
-const ROUTE_MODE = (process.env.AI_GF_ROUTE_MODE || "gateway").toLowerCase();
 const SESSION_MODE = (process.env.AI_GF_SESSION_MODE || "fixed").toLowerCase(); // fixed | token
 const FIXED_SESSION_ID = process.env.AI_GF_FIXED_SESSION_ID || "ai-gf-fixed-session";
 const GATEWAY_SESSION_PREFIX = process.env.AI_GF_GATEWAY_SESSION_PREFIX || "voice-bridge-session-ai-gf-";
-const LEGACY_SESSION_PREFIX = process.env.AI_GF_LEGACY_SESSION_PREFIX || "ai-gf-clawra-";
 
 const SYSTEM_PROMPT = process.env.AI_GF_SYSTEM_PROMPT || "你是AI女友对话引擎，请自然回复用户。";
-const OPENCLAW_BIN = process.env.AI_GF_OPENCLAW_BIN || (process.platform === "win32" ? "openclaw.cmd" : "openclaw");
-const OPENCLAW_USE_SHELL = process.platform === "win32";
 
 const sessions = new Map<string, GfSession>();
-const execFileAsync = promisify(execFile);
 
 function loadSessions() {
   try {
@@ -114,55 +108,6 @@ function parseMaybeJsonObject(raw: string): any | null {
   return null;
 }
 
-function extractAssistantText(data: any): string {
-  const content = data?.choices?.[0]?.message?.content;
-  if (typeof content === "string") return content.trim();
-  if (typeof content?.text === "string") return content.text.trim();
-  if (Array.isArray(content)) {
-    const joined = content
-      .map((item: any) => {
-        if (typeof item === "string") return item;
-        if (typeof item?.text === "string") return item.text;
-        if (typeof item?.output_text === "string") return item.output_text;
-        return "";
-      })
-      .join("\n")
-      .trim();
-    if (joined) return joined;
-  }
-
-  const choiceText = data?.choices?.[0]?.text;
-  if (typeof choiceText === "string" && choiceText.trim()) return choiceText.trim();
-
-  const outputText = data?.output_text;
-  if (typeof outputText === "string" && outputText.trim()) return outputText.trim();
-
-  const output = data?.output;
-  if (Array.isArray(output)) {
-    const joined = output
-      .flatMap((item: any) => {
-        if (!item) return [];
-        if (typeof item?.content === "string") return [item.content];
-        if (Array.isArray(item?.content)) {
-          return item.content
-            .map((c: any) => {
-              if (typeof c === "string") return c;
-              if (typeof c?.text === "string") return c.text;
-              if (typeof c?.output_text === "string") return c.output_text;
-              return "";
-            })
-            .filter(Boolean);
-        }
-        return [];
-      })
-      .join("\n")
-      .trim();
-    if (joined) return joined;
-  }
-
-  return "";
-}
-
 function buildPlaceholderReply(text: string): GfReply {
   const plain = (text || "").trim() || "收到啦，我在听。";
   const duration = Math.max(900, Math.min(5000, plain.length * 220));
@@ -193,49 +138,67 @@ function resolveRoutedSessionId(sessionToken: string, sessionPrefix: string): st
   return `${sessionPrefix}${sessionToken}`;
 }
 
-async function callViaOpenClawSession(sessionToken: string, userText: string, sessionPrefix: string): Promise<string> {
-  const sessionId = resolveRoutedSessionId(sessionToken, sessionPrefix);
+function pickAssistantText(messages: unknown[]): string {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m: any = messages[i];
+    if (String(m?.role || "").toLowerCase() !== "assistant") continue;
+
+    if (typeof m?.text === "string" && m.text.trim()) return m.text.trim();
+    if (typeof m?.content === "string" && m.content.trim()) return m.content.trim();
+
+    if (Array.isArray(m?.content)) {
+      const joined = m.content
+        .map((c: any) => {
+          if (typeof c === "string") return c;
+          if (typeof c?.text === "string") return c.text;
+          if (typeof c?.output_text === "string") return c.output_text;
+          return "";
+        })
+        .filter(Boolean)
+        .join("\n")
+        .trim();
+      if (joined) return joined;
+    }
+  }
+  return "";
+}
+
+async function callViaRuntimeSession(sessionToken: string, userText: string): Promise<string> {
+  const runtime = getRuntime();
+  const subagent = runtime?.subagent;
+  if (!subagent?.run || !subagent?.waitForRun || !subagent?.getSessionMessages) {
+    throw new Error("runtime subagent API unavailable");
+  }
+
+  const sessionId = resolveRoutedSessionId(sessionToken, GATEWAY_SESSION_PREFIX);
   const routedMessage = [
     "[角色设定] 你是 Clawra。名字固定为 Clawra，不得自称小暖或其他名字。",
     "[输出要求] 自然回复用户，不要解释规则。",
     `用户消息：${userText}`,
   ].join("\n");
-  const { stdout } = await execFileAsync(OPENCLAW_BIN, [
-    "agent",
-    "--session-id", sessionId,
-    "--channel", "last",
-    "--message", routedMessage,
-    "--json",
-  ], {
-    timeout: AGENT_TIMEOUT_MS,
-    maxBuffer: 1024 * 1024,
-    shell: OPENCLAW_USE_SHELL,
+
+  const { runId } = await subagent.run({
+    sessionKey: sessionId,
+    message: routedMessage,
+    deliver: false,
   });
 
-  const raw = String(stdout || "").trim();
-  const start = raw.indexOf("{");
-  if (start < 0) throw new Error("agent output missing json");
-  const obj = JSON.parse(raw.slice(start)) as any;
-
-  const payloads = obj?.result?.payloads;
-  if (Array.isArray(payloads)) {
-    for (const p of payloads) {
-      if (typeof p?.text === "string" && p.text.trim()) return p.text.trim();
-    }
+  const waited = await subagent.waitForRun({ runId, timeoutMs: AGENT_TIMEOUT_MS });
+  if (waited.status !== "ok") {
+    throw new Error(waited.error || `subagent run ${waited.status}`);
   }
-  throw new Error("agent payload text empty");
+
+  const result = await subagent.getSessionMessages({ sessionKey: sessionId, limit: 12 });
+  const text = pickAssistantText(Array.isArray(result?.messages) ? result.messages : []);
+  if (!text) throw new Error("runtime session assistant text empty");
+  return text;
 }
 
 async function callModel(session: GfSession, text: string): Promise<GfReply> {
   session.history.push({ role: "user", content: text });
   const system = session.history.find((m) => m.role === "system")?.content || SYSTEM_PROMPT;
 
-  let modelText = "";
-  if (ROUTE_MODE === "gateway") {
-    modelText = await callViaOpenClawSession(session.token, text, GATEWAY_SESSION_PREFIX);
-  } else {
-    modelText = await callViaOpenClawSession(session.token, text, LEGACY_SESSION_PREFIX);
-  }
+  const modelText = await callViaRuntimeSession(session.token, text);
 
   const safe = toStructuredReply(modelText, `收到：${text}`);
   session.history.push({ role: "assistant", content: safe.text });
@@ -253,14 +216,10 @@ export async function handleAiGirlfriendHttpRequest(req: IncomingMessage, res: S
       ok: true,
       route: "ai-girlfriend",
       sessions: sessions.size,
-      mode: "gateway-integrated-core",
-      routeMode: ROUTE_MODE,
+      mode: "gateway-runtime-api",
       sessionMode: SESSION_MODE,
       fixedSessionId: FIXED_SESSION_ID,
       gatewaySessionPrefix: GATEWAY_SESSION_PREFIX,
-      legacySessionPrefix: LEGACY_SESSION_PREFIX,
-      openclawBin: OPENCLAW_BIN,
-      openclawUseShell: OPENCLAW_USE_SHELL,
     });
     return true;
   }
