@@ -41,3 +41,56 @@
 - `localWsUrl = ws://127.0.0.1:43113/api/v1/game/ws`
 - `fallbackWsUrl = ws://127.0.0.1:43113/api/v1/game/ws`
 - `pseudoSession.token = ai-gf-main-token`
+
+## 发布前自检清单
+
+按顺序执行，全部通过再给 UE 接入：
+
+### 1) 插件已加载
+
+```bash
+openclaw status
+```
+
+确认插件列表里有 `ai-girlfriend`。
+
+### 2) 插件健康接口正常
+
+```bash
+curl -sS http://127.0.0.1:18789/api/ai-gf/health
+```
+
+预期：返回 `ok: true`，且包含 `routeMode`、`sessionMode` 等字段。
+
+### 3) 内嵌 adapter 进程已启动（43113）
+
+```bash
+curl -sS http://127.0.0.1:43113/healthz
+```
+
+预期：返回健康状态（HTTP 200）。
+
+### 4) HTTP 聊天链路可用
+
+```bash
+curl -sS -X POST http://127.0.0.1:18789/api/ai-gf/chat \
+  -H 'Authorization: Bearer ai-gf-main-token' \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"你好，做个链路自检"}'
+```
+
+预期：返回 `ok: true`，`data` 内有 `text/emotion/actions/subtitleTimeline`。
+
+### 5) WebSocket 端点可握手
+
+用任意 WS 客户端连接：
+
+- `ws://127.0.0.1:43113/api/v1/game/ws`
+
+预期：可以建立连接，不出现 404/连接拒绝。
+
+### 6) 常见失败位快速排查
+
+- `43113` 不通：通常是 adapter 没起（先看步骤 1、2）
+- WS 404：通常是 URL 写错，不是 `/api/ai-gf/*`
+- 聊天 500：优先看 gateway 日志里的 `ai-gf` 路由报错
