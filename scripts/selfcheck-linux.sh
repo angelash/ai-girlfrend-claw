@@ -34,7 +34,7 @@ else
   err "chat api request failed"
 fi
 
-step "5) WebSocket endpoint reachability"
+step "4) WebSocket endpoint reachability"
 if command -v curl >/dev/null 2>&1; then
   code=$(curl -sS -o /dev/null -w "%{http_code}" "$ADAPTER_BASE_URL/api/v1/game/ws" || true)
   if [[ "$code" == "400" || "$code" == "426" || "$code" == "404" ]]; then

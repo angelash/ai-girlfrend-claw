@@ -118,11 +118,10 @@ bash ./scripts/selfcheck-linux.sh
 ```
 
 自检项：
-1) openclaw 命令可用
-2) `/api/ai-gf/health`
-3) `43113/healthz`
-4) `/api/ai-gf/chat`
-5) `ws://127.0.0.1:43113/api/v1/game/ws` 端点可用性
+1) `/api/ai-gf/health`
+2) `43113/healthz`
+3) `/api/ai-gf/chat`
+4) `ws://127.0.0.1:43113/api/v1/game/ws` 端点可用性
 
 ## 发布前自检清单
 
