@@ -121,7 +121,7 @@ bash ./scripts/selfcheck-linux.sh
 1) `/api/ai-gf/health`
 2) `43113/healthz`
 3) `/api/ai-gf/chat`
-4) `ws://127.0.0.1:43113/api/v1/game/ws` 端点可用性
+4) `ws://127.0.0.1:43113/api/v1/game/ws` WebSocket 握手
 
 ## 发布前自检清单
 

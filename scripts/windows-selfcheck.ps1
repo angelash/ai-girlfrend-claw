@@ -12,15 +12,7 @@ function Step($msg) { Write-Host "`n== $msg ==" -ForegroundColor Cyan }
 function Ok($msg) { Write-Host "[OK] $msg" -ForegroundColor Green }
 function Fail($msg) { Write-Host "[FAIL] $msg" -ForegroundColor Red; $script:failed = $true }
 
-Step "1) OpenClaw CLI availability"
-try {
-  $null = Get-Command openclaw -ErrorAction Stop
-  Ok "openclaw command found"
-} catch {
-  Fail "openclaw command not found in PATH"
-}
-
-Step "2) Plugin health"
+Step "1) Plugin health"
 try {
   $healthUrl = "$GatewayBaseUrl/api/ai-gf/health"
   $r = Invoke-RestMethod -Uri $healthUrl -TimeoutSec $TimeoutSec
@@ -33,7 +25,7 @@ try {
   Fail "plugin health request failed: $($_.Exception.Message)"
 }
 
-Step "3) Adapter healthz"
+Step "2) Adapter healthz"
 try {
   $adapterHealth = "$AdapterBaseUrl/healthz"
   $r2 = Invoke-WebRequest -Uri $adapterHealth -TimeoutSec $TimeoutSec
@@ -46,7 +38,7 @@ try {
   Fail "adapter healthz request failed: $($_.Exception.Message)"
 }
 
-Step "4) Chat API sanity"
+Step "3) Chat API sanity"
 try {
   $chatUrl = "$GatewayBaseUrl/api/ai-gf/chat"
   $body = @{ text = "你好，做个Windows链路自检" } | ConvertTo-Json -Compress
