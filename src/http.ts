@@ -11,7 +11,7 @@ const LOGIN = "/api/ai-gf/session/login";
 const INFO = "/api/ai-gf/session/info";
 const CHAT = "/api/ai-gf/chat";
 
-const PERSIST_PATH = process.env.AI_GF_SESSION_PATH || "/home/shash/clawd/state/ai-gf-sessions.json";
+const PERSIST_PATH = process.env.AI_GF_SESSION_PATH || path.resolve(process.cwd(), "state", "ai-gf-sessions.json");
 const AGENT_TIMEOUT_MS = Number(process.env.AI_GF_AGENT_TIMEOUT_MS || "30000");
 const ROUTE_MODE = (process.env.AI_GF_ROUTE_MODE || "gateway").toLowerCase();
 const SESSION_MODE = (process.env.AI_GF_SESSION_MODE || "fixed").toLowerCase(); // fixed | token

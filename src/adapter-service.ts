@@ -1,10 +1,13 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 let child: ChildProcess | null = null;
 
-const ADAPTER_DIR = "/home/shash/clawd/extensions/ai-girlfriend/vendor/lobster-adapter";
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const EXT_ROOT = path.resolve(HERE, "..");
+const ADAPTER_DIR = path.join(EXT_ROOT, "vendor", "lobster-adapter");
 
 export function startAdapterService(log?: { info?: (...args: any[]) => void; warn?: (...args: any[]) => void; error?: (...args: any[]) => void }) {
   if (child && !child.killed) return;
