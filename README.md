@@ -69,33 +69,60 @@ npm run build
 
 > 建议：开发机可先拉下即用；上线环境建议执行一次本地编译后再启用。
 
-## Windows 一键自检
+## 一键部署脚本（Windows / Linux）
 
-仓库已提供 PowerShell 自检脚本：
+- Windows: `scripts/bootstrap-windows.ps1`
+- Linux: `scripts/bootstrap-linux.sh`
 
-- `scripts/windows-selfcheck.ps1`
+两个脚本都会执行：
+1) 进入 `vendor/lobster-adapter` 执行 `npm ci && npm run build`
+2) `openclaw gateway restart`
+3) 运行对应平台自检
 
-执行：
+### Windows
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-windows.ps1
+```
+
+### Linux
+
+```bash
+bash ./scripts/bootstrap-linux.sh
+```
+
+可选参数（Linux 通过环境变量）：
+
+```bash
+GATEWAY_BASE_URL=http://127.0.0.1:18789 \
+ADAPTER_BASE_URL=http://127.0.0.1:43113 \
+TOKEN=ai-gf-main-token \
+bash ./scripts/bootstrap-linux.sh
+```
+
+## 自检脚本
+
+- Windows: `scripts/windows-selfcheck.ps1`
+- Linux: `scripts/selfcheck-linux.sh`
+
+Windows 自检执行：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\windows-selfcheck.ps1
 ```
 
-可选参数：
+Linux 自检执行：
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows-selfcheck.ps1 \
-  -GatewayBaseUrl "http://127.0.0.1:18789" \
-  -AdapterBaseUrl "http://127.0.0.1:43113" \
-  -Token "ai-gf-main-token"
+```bash
+bash ./scripts/selfcheck-linux.sh
 ```
 
-脚本会检查：
+自检项：
 1) openclaw 命令可用
 2) `/api/ai-gf/health`
 3) `43113/healthz`
 4) `/api/ai-gf/chat`
-5) `ws://127.0.0.1:43113/api/v1/game/ws` 握手
+5) `ws://127.0.0.1:43113/api/v1/game/ws` 端点可用性
 
 ## 发布前自检清单
 
