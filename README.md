@@ -34,6 +34,7 @@
 - `AI_GF_AGENT_TIMEOUT_MS`：默认 `30000`
 - `AI_GF_SESSION_PATH`：默认 `./state/ai-gf-sessions.json`（建议按部署环境配置）
 - `AI_GF_SYSTEM_PROMPT`
+- `AI_GF_OPENCLAW_BIN`：可选，覆盖 OpenClaw CLI 命令名（Windows 可设为 `openclaw.cmd` 或绝对路径）
 
 ## UE 客户端建议配置
 
@@ -41,6 +42,21 @@
 - `localWsUrl = ws://127.0.0.1:43113/api/v1/game/ws`
 - `fallbackWsUrl = ws://127.0.0.1:43113/api/v1/game/ws`
 - `pseudoSession.token = ai-gf-main-token`
+
+## Windows 环境补充
+
+- 插件内调用 OpenClaw CLI 已兼容 Windows（默认 `openclaw.cmd` + shell 模式）
+- 若你的机器命令名不同，设置：
+
+```bash
+AI_GF_OPENCLAW_BIN=C:\\path\\to\\openclaw.cmd
+```
+
+- 建议在 Windows 部署时显式设置会话持久化路径：
+
+```bash
+AI_GF_SESSION_PATH=C:\\openclaw\\state\\ai-gf-sessions.json
+```
 
 ## 发布前自检清单
 

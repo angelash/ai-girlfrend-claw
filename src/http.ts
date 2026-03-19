@@ -20,6 +20,8 @@ const GATEWAY_SESSION_PREFIX = process.env.AI_GF_GATEWAY_SESSION_PREFIX || "voic
 const LEGACY_SESSION_PREFIX = process.env.AI_GF_LEGACY_SESSION_PREFIX || "ai-gf-clawra-";
 
 const SYSTEM_PROMPT = process.env.AI_GF_SYSTEM_PROMPT || "你是AI女友对话引擎，请自然回复用户。";
+const OPENCLAW_BIN = process.env.AI_GF_OPENCLAW_BIN || (process.platform === "win32" ? "openclaw.cmd" : "openclaw");
+const OPENCLAW_USE_SHELL = process.platform === "win32";
 
 const sessions = new Map<string, GfSession>();
 const execFileAsync = promisify(execFile);
@@ -198,7 +200,7 @@ async function callViaOpenClawSession(sessionToken: string, userText: string, se
     "[输出要求] 自然回复用户，不要解释规则。",
     `用户消息：${userText}`,
   ].join("\n");
-  const { stdout } = await execFileAsync("openclaw", [
+  const { stdout } = await execFileAsync(OPENCLAW_BIN, [
     "agent",
     "--session-id", sessionId,
     "--channel", "last",
@@ -207,6 +209,7 @@ async function callViaOpenClawSession(sessionToken: string, userText: string, se
   ], {
     timeout: AGENT_TIMEOUT_MS,
     maxBuffer: 1024 * 1024,
+    shell: OPENCLAW_USE_SHELL,
   });
 
   const raw = String(stdout || "").trim();
@@ -256,6 +259,8 @@ export async function handleAiGirlfriendHttpRequest(req: IncomingMessage, res: S
       fixedSessionId: FIXED_SESSION_ID,
       gatewaySessionPrefix: GATEWAY_SESSION_PREFIX,
       legacySessionPrefix: LEGACY_SESSION_PREFIX,
+      openclawBin: OPENCLAW_BIN,
+      openclawUseShell: OPENCLAW_USE_SHELL,
     });
     return true;
   }
