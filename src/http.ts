@@ -181,6 +181,7 @@ async function callViaRuntimeSession(sessionToken: string, userText: string): Pr
     sessionKey: sessionId,
     message: routedMessage,
     deliver: false,
+    idempotencyKey: randomUUID(),
   });
 
   const waited = await subagent.waitForRun({ runId, timeoutMs: AGENT_TIMEOUT_MS });

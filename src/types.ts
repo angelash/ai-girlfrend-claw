@@ -7,7 +7,13 @@ export interface RuntimeContextLike {
     error?: (...args: any[]) => void;
   };
   subagent?: {
-    run?: (params: { sessionKey: string; message: string; deliver?: boolean; extraSystemPrompt?: string }) => Promise<{ runId: string }>;
+    run?: (params: {
+      sessionKey: string;
+      message: string;
+      deliver?: boolean;
+      extraSystemPrompt?: string;
+      idempotencyKey: string;
+    }) => Promise<{ runId: string }>;
     waitForRun?: (params: { runId: string; timeoutMs?: number }) => Promise<{ status: "ok" | "error" | "timeout"; error?: string }>;
     getSessionMessages?: (params: { sessionKey: string; limit?: number }) => Promise<{ messages: unknown[] }>;
   };
